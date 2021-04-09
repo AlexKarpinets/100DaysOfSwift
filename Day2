@@ -1,0 +1,81 @@
+// arrays (упорядоченный порядок элементов, обращение через индекс, могут содержать дубликаты)
+let john = "John Lennon"
+let paul = "Paul McCartney"
+let george = "George Harrison"
+let ringo = "Ringo Starr"
+let beatles = [john, paul, george, ringo]
+beatles[1]
+
+// sets (неупорядоченный порядок элементов, повторные значения игнорируются, быстрый поиск элементов по сравнению с массивами)
+let colors = Set(["red", "green", "blue"])
+let colors2 = Set(["red", "green", "blue", "red", "blue"])
+
+// tuples (нельзя добовлять или удалять элементы из кортежа, нельзя менять тип данных в кортеже, можно обращаться как по индексу, так и по имени)
+var name = (first: "Taylor", last: "Swift")
+name.0
+name.first
+
+// arrays vs sets vs tuples
+/*Если вы хотите сохранить список всех слов в словаре для игры, у него нет дубликатов, и порядок не имеет значения, поэтому вы бы выбрали набор.
+ Если вы хотите сохранить все статьи, прочитанные пользователем, вы можете использовать набор, если порядок не имеет значения (если все, что вас волнует, это то, прочитали ли они его или нет), или использовать массив, если порядок имеет значение.
+ Если вы хотите сохранить список рекордов для видеоигры, у него есть порядок, который имеет значение и может содержать дубликаты (если два игрока получают одинаковый балл), поэтому вы бы использовали массив.
+ Если вы хотите хранить элементы для списка задач, это лучше всего работает, когда порядок предсказуем, поэтому вы должны использовать массив.
+ Если вы хотите держать ровно две строки, или точно две строки и целое число, или точно три логических значения, или что-то подобное, вы должны использовать кортеж.*/
+let address = (house: 555, street: "Taylor Swift Avenue", city: "Nashville")
+let set = Set(["aardvark", "astronaut", "azalea"])
+let pythons = ["Eric", "Graham", "John", "Michael", "Terry", "Terry"]
+
+// dictionaries (можно обращаться по ключам, поиск быстрее чем в массиве, неупорядочное хранение элементов как и в множествах)
+let heights = [
+    "Taylor Swift": 1.78,
+    "Ed Sheeran": 1.73
+]
+heights["Taylor Swift"]
+
+// dictionary default values (для не найденных элементов присваивает nil, но можно задать дефолтное значение)
+let favoriteIceCream = [
+    "Paul": "Chocolate",
+    "Sophie": "Vanilla"
+]
+favoriteIceCream["Paul"]
+favoriteIceCream["Charlotte"]
+favoriteIceCream["Charlotte", default: "Unknown"]
+
+// creating empty collections (пример - нужно перебрать имена начинающиеся с определенной буквы)
+var teams = [String: String]()
+teams["Paul"] = "Red"
+var results = [Int]()
+var words = Set<String>()
+var numbers = Set<Int>()
+var scores = Dictionary<String, Int>()
+var results2 = Array<Int>()
+
+// enumerations
+let result10 = "failure"
+let result11 = "failed"
+let result12 = "fail"
+enum Result {
+    case success
+    case failure
+}
+let result13 = Result.failure
+
+// enum associated values (перечисления со связанными значениями позволяют нам добавить дополнительную информацию к падежу перечисления – думайте о них как о прилагательных к существительному, потому что это позволяет нам описать вещь более подробно, например вероятность дождя, скорость ветра)
+enum Activity{
+    case bored
+    case running(destination: String)
+    case talking(topic: String)
+    case singing(volume: Int)
+}
+let talking = Activity.talking(topic: "football")
+
+// enum raw values
+enum Planet: Int {
+    case mercury = 1
+    case venus
+    case earth
+    case mars
+}
+let earth = Planet(rawValue: 2)
+
+// complex types:Summary
