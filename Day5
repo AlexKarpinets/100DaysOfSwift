@@ -1,0 +1,106 @@
+// writing function
+func printHelp() {
+    let message = """
+    Welcome to MyApp!
+    Run this app inside a directory of images and MyApp will resize them all into thumbnails
+    """
+    print(message)
+}
+printHelp()
+
+// accepting parameters
+func square(number: Int) {
+    print(number * number)
+}
+square(number: 8)
+
+// returning values (присвоил константе возвращаемое значение)
+func square1(number: Int) -> Int {
+    return number * number
+}
+let result = square1(number: 8)
+print(result)
+
+// parameter labels (дополнительная метка для удобства чтения)
+func square2(number: Int) -> Int {
+    return number * number
+}
+let result2 = square2(number: 8)
+func sayHello(to name: String) {
+    print("Hello, \(name)!")
+}
+sayHello(to: "Taylor")
+
+// omitting parameter labels (пропускаем параметр - person)
+func greet(_person: String) {
+    print("Hello, \(_person)!")
+}
+greet(_person: "Taylor")
+
+// default parameters (параметры по умолчанию)
+func greet1(_ person: String, nicely: Bool = true) {
+    if nicely == true {
+        print("Hello, \(person)!")
+    } else {
+        print("Oh no, it's \(person) again...")
+    }
+}
+greet1("Taylor")
+greet1("Taylor", nicely: false)
+
+// variadic functions
+print("Haters", "gonna", "hate")
+func square3(numbers: Int...) {
+    for number in numbers {
+        print("\(number) squared is \(number * number)")
+    }
+}
+square3(numbers: 1, 2, 3, 4, 5)
+
+// writing throwing functions (выбрасывание ошибок)
+enum PasswordError: Error {
+    case obvious
+}
+func checkPassword(_ password: String) throws -> Bool {
+    if password == "password" {
+        throw PasswordError.obvious
+    }
+    return true
+}
+enum PlayError: Error {
+    case cheating
+    case noPlayers
+}
+func playGame(name: String, cheat: Bool = false) throws {
+    if cheat {
+        throw PlayError.cheating
+    } else {
+        print("Let's play a game of \(name)...")
+    }
+}
+enum PizzaErrors: Error {
+    case hasPineapple
+}
+func makePizza(type: String) throws {
+    if type != "Hawaiian" {
+        print("Your pizza will be ready in 10 minutes.")
+    } else {
+        throw PizzaErrors.hasPineapple
+    }
+}
+
+// running throwing functions (do запускает раздел кода, который может вызвать проблемы, try используется перед каждой функцией, которая может выдать ошибку, а catch позволяет изящно обрабатывать ошибки.)
+do {
+    try checkPassword("password")
+    print("That password is good!")
+} catch {
+    print("You can't use that password.")
+}
+
+// inout parameters (параметры в функциях передаются как константы, чтобы изменить значение - inout. Для изменения переменных внутри функции, но обычно лучше возвращать новое значение.)
+func doubleInPlace(number: inout Int) {
+    number *= 2
+}
+var myNum = 10
+doubleInPlace(number: &myNum)
+
