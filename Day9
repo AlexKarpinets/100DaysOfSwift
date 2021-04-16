@@ -1,0 +1,129 @@
+// Initializers (можно расширять external.init)
+struct User {
+    var username: String
+    init() {
+        username = "Anonymous"
+        print("Creating a new user!")
+    }
+}
+var user = User()
+user.username = "twostraws"
+struct Message {
+    var from: String
+    var to: String
+    var content: String
+    init() {
+        from = "Unknown"
+        to = "Unknown"
+        content = "Yo"
+    }
+}
+let message = Message()
+struct Cabinet {
+    var height: Double
+    var width: Double
+    var area: Double
+    init (itemHeight: Double, itemWidth: Double) {
+        height = itemHeight
+        width = itemWidth
+        area = height * width
+    }
+}
+let drawers = Cabinet(itemHeight: 1.4, itemWidth: 1.0)
+
+// Referring to the current instance (если вы создаете структуру Person со свойством name1, а затем пытаетесь написать инициализатор, который принимает параметр name1, self помогает вам различать свойство и параметр – self.name1 относится к свойству, тогда как имя относится к параметру.)
+struct Person {
+    var name1: String
+    init(name1: String){
+        print("\(name1) was born!")
+        self.name1 = name1
+    }
+}
+struct Conference {
+    var name: String
+    var location: String
+    init(name: String, location: String) {
+        self.name = name
+        self.location = location
+    }
+}
+let wwdc = Conference(name: "WWDC", location: "San Jose")
+struct District {
+    var number: Int
+    var supervisor: String
+    init(number: Int, supervisor: String) {
+        self.number = number
+        self.supervisor = supervisor
+    }
+}
+let district = District(number: 9, supervisor: "Unknown")
+
+// Lazy properties (Ленивые свойства Swift позволяют нам задерживать создание свойства до тех пор, пока оно не будет фактически использовано, что делает их похожими на вычисляемое свойство. Однако, в отличие от вычисляемого свойства, они хранят результат, который вычисляется, так что последующие обращения к этому свойству не повторяют работу. Это позволяет им обеспечивать дополнительную производительность, когда они не используются (потому что их код никогда не запускается), и дополнительную производительность, когда они используются повторно (потому что их значение кэшируется.)
+struct FamilyTree {
+    init() {
+        print("Creating family tree!")
+    }
+}
+struct Person1 {
+    var name3: String
+    lazy var familyTree = FamilyTree()
+    init(name3: String) {
+        self.name3 = name3
+    }
+}
+var ed = Person1(name3: "Ed")
+ed.familyTree
+
+/* Static properties and methods (Большинство людей, изучающих Swift, сразу видят ценность регулярных свойств и методов, но изо всех сил пытаются понять, почему статические свойства и методы были бы полезны. Конечно, они менее полезны, чем обычные свойства и методы, но они все еще довольно распространены в Swift-коде.
+ 
+ Одним из распространенных применений статических свойств и методов является хранение общих функций, используемых во всем приложении. Например, я делаю приложение под названием Unwrap, которое является бесплатным приложением iOS для людей, изучающих Swift. В приложении я хочу сохранить некоторую общую информацию, такую как URL-адрес приложения в App Store, чтобы я мог ссылаться на него в любом месте, где это нужно приложению. Итак, у меня есть такой код, хранящий мои данные:
+
+ struct Unwrap {
+ статический let AppURL = "https://itunes.apple.com/app/id1440611372"
+ }
+ Таким образом, я могу написать Unwrap.AppURL, когда кто-то делится чем-то из приложения, что помогает другим людям открыть это приложение. Без ключевого слова static мне нужно было бы создать новый экземпляр структуры Unwrap только для чтения фиксированного URL-адреса приложения, что на самом деле не обязательно. */
+struct Student {
+    static var classSize = 0
+    var name4: String
+    init(name4: String) {
+        self.name4 = name4
+        Student.classSize += 1
+    }
+}
+let ed2 = Student(name4: "Ed")
+let taylor = Student(name4: "Taylor")
+print(Student.classSize)
+struct LegoBrick {
+    static var numberMade = 0
+    var shape: String
+    var color: String
+    init(shape: String, color: String) {
+        self.shape = shape
+        self.color = color
+        LegoBrick.numberMade += 1
+    }
+}
+
+// Access control (Управление доступом позволяет ограничить, какой код может использовать свойства и методы. Это важно, потому что вы можете остановить людей, читающих свойство напрямую)
+/* Ключевые слова управления доступом Swift позволяют нам ограничить доступ к различным частям нашего кода, но большую часть времени он просто подчиняется правилам, которые мы установили – мы могли бы удалить их, если бы захотели, и обойти ограничения, так в чем же смысл?
+ 
+ На этот вопрос есть несколько ответов, но один из них особенно прост, поэтому я начну с него: иногда контроль доступа используется в коде, которым вы не владеете, поэтому вы не можете снять это ограничение. Это часто происходит, когда вы создаете приложения с помощью API Apple, например: они устанавливают ограничения на то, что вы можете и не можете делать, и вы должны соблюдать эти ограничения. */
+struct Person5 {
+  private var id: String
+    init(id: String) {
+    self.id = id
+}
+    func identify() -> String {
+    return "My social security number is \(id)"
+}
+}
+let ed5 = Person5(id: "12345")
+struct Customer {
+    var name: String
+    private var creditCardNumber: Int
+    init(name: String, creditCard: Int) {
+        self.name = name
+        self.creditCardNumber = creditCard
+    }
+}
+let lottie = Customer(name: "Lottie Knights", creditCard: 1234567890)
