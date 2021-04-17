@@ -1,0 +1,160 @@
+// Creating your own classes (классы вводят новую, важную и сложную функцию, называемую наследованием – способность заставить один класс строить на основе другого).
+/* Классы не поставляются с синтезированными инициализаторами memberwise.
+ Один класс может быть построен на основе (“наследоваться") другого класса, приобретая его свойства и методы.
+ Копии структур всегда уникальны, тогда как копии классов фактически указывают на одни и те же общие данные.
+ Классы имеют деинициализаторы, то есть методы, которые вызываются при уничтожении экземпляра класса, а структуры-нет.
+ Переменные свойства в постоянных классах могут быть изменены свободно, но переменные свойства в постоянных структурах не могут.
+ Вскоре я объясню эти различия более подробно, но суть в том, что они существуют и имеют значение. Большинство разработчиков Swift предпочитают использовать структуры, а не классы, когда это возможно, что означает, что когда вы выбираете класс вместо структуры, вы делаете это потому, что хотите одно из вышеперечисленных поведений. */
+class Dog {
+    var name: String
+    var breed: String
+    init(name: String, breed: String) {
+        self.name = name
+        self.breed = breed
+    }
+}
+let poppy = Dog(name: "Poppy", breed: "Poodle")
+class VideoGame {
+    var hero: String
+    var enemy: String
+    init(heroName: String, enemyName: String) {
+        self.hero = heroName
+        self.enemy = enemyName
+    }
+}
+let monkeyIsland = VideoGame(heroName: "Guybrush Threepwood", enemyName: "LeChuck")
+
+// Class inheritance
+class Dog1 {
+    var name1: String
+    var breed1: String
+
+    init(name1: String, breed1: String) {
+        self.name1 = name1
+        self.breed1 = breed1
+    }
+}
+class Poodle: Dog1 { //новый класс, основанный на том, который называется Пудель. Он унаследует те же свойства и инициализатор, что и Dog по умолчанию)
+    init(name1: String) {
+        super.init(name1: name1, breed1: "Poodle") // (Oднако мы также можем дать Пуделю его собственный инициализатор. Мы знаем, что у него всегда будет порода “Пудель”, поэтому мы можем сделать новый инициализатор, которому нужно только свойство name. Еще лучше, мы можем сделать так, чтобы инициализатор пуделя вызывал инициализатор собаки напрямую, так что происходит все та же настройка)
+    }
+}
+class Product {
+    var name: String
+    init(name: String) {
+        self.name = name
+    }
+}
+class Book: Product {
+    var isbn: String
+    init(name: String, isbn: String) {
+        self.isbn = isbn
+        super.init(name: name)
+    }
+}
+class Instrument {
+    var name: String
+    init(name: String) {
+        self.name = name
+    }
+}
+class Piano: Instrument {
+    var isElectric: Bool
+    init(isElectric: Bool) {
+        self.isElectric = isElectric
+        super.init(name: "Piano")
+    }
+}
+
+// Overriding methods
+class Dog3 {
+func makeNoise() {
+    print("Woof!")
+}
+}
+class Poodle3: Dog3 {
+    override func makeNoise() {
+        print("Yip!")
+    }
+}
+let poppy3 = Poodle3()
+poppy3.makeNoise()
+class Band {
+    func singSong() {
+        print("Here's a new song.")
+    }
+}
+class MetalBand: Band {
+    override func singSong() {
+        print("Ruuuuh ruh ruh ruuuuuh!")
+    }
+}
+let lordi = MetalBand()
+lordi.singSong()
+class Composer {
+    func composeMusic() {
+        print("Here's some music I wrote.")
+    }
+}
+class OperaComposer: Composer {
+    override func composeMusic() {
+        print("Here's an opera I wrote.")
+    }
+}
+let verdi = OperaComposer()
+verdi.composeMusic()
+
+// Final classes (запрещает наследование класса)
+final class Dog7 {
+    var name7: String
+    var breed7: String
+
+    init(name7: String, breed7: String) {
+        self.name7 = name7
+        self.breed7 = breed7
+    }
+}
+
+// Copying objects
+class Singer {
+    var name8 = "Taylor Swift"
+}
+var singer = Singer()
+print(singer.name8)
+var singerCopy = singer
+singerCopy.name8 = "Justin Bieber"
+print(singer.name8)
+
+// Deinitializers (уничтожает экземпляр класса)
+/* За кулисами Swift выполняет то, что называется автоматическим подсчетом ссылок, или ARC. ARC отслеживает, сколько копий существует каждого экземпляра класса: каждый раз, когда вы берете копию экземпляра класса, Swift добавляет 1 к его количеству ссылок, и каждый раз, когда копия уничтожается, Swift вычитает 1 из его количества ссылок. Когда счетчик достигает 0, это означает, что никто больше не обращается к классу, и Swift вызовет его деинициализатор и уничтожит объект.
+ 
+ Итак, простая причина, по которой структуры не имеют деинициализаторов, заключается в том, что они им не нужны: каждая структура имеет свою собственную копию своих данных, поэтому ничего особенного не должно произойти, когда она будет уничтожена. */
+class Person9 {
+    var name9 = "John Doe"
+    init() {
+        print("\(name9) is alive!")
+    }
+    func printGreeting() {
+        print("Hello, i'm \(name9)")
+    }
+    deinit {
+        print("\(name9) is no more!")
+    }
+}
+for _ in 1...3 {
+    let person = Person9()
+    person.printGreeting()
+}
+class IceCream {
+    deinit {
+        print("No more icecream :(")
+    }
+}
+
+// Mutability
+class Singer2 {
+    var name10 = "Taylor Swift"
+}
+let taylor10 = Singer2()
+taylor10.name10 = "Vasya"
+print(taylor10.name10)
