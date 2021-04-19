@@ -1,0 +1,190 @@
+// Handling missing data
+var age: Int? = nil
+age = 38
+
+// Unwrapping optionals
+var name: String? = nil
+if let unwrapped = name {
+    print("(unwrapped.count) letters")
+} else {
+    print("Missing name.")
+}
+let currentDestination: String? = nil
+if let destination = currentDestination {
+    print("We're walking to \(destination).")
+} else {
+    print("We're just wandering.")
+}
+
+// Unwrapping with guard (guard let предназначен для выхода из текущей функции, цикла или условия в случае сбоя проверки, поэтому любые значения, которые вы разворачиваете с его помощью, останутся после проверки. Поэтому используйте if let, если вы просто хотите развернуть некоторые опции, но предпочитаете guard let, если вы специально проверяете правильность условий, прежде чем продолжить.)
+func greet(_ name1: String?) {
+    guard let unwrapped1 = name1 else {
+        print("You didn't provide a name!")
+        return
+    }
+    print("Hello, \(unwrapped1)!")
+}
+func isLongEnough(_ string: String?) -> Bool {
+    guard let string = string else { return false }
+    if string.count >= 8 {
+        return true
+    } else {
+        return false
+    }
+}
+if isLongEnough("Mario Odyssey") {
+    print("Let's play that!")
+}
+func test(number: Int?) {
+    guard let number = number else { return }
+    print("Number is \(number)")
+}
+test(number: 42)
+
+// Force unwrapping
+let str = "5"
+let num = Int(str)
+//let num = Int(str)!
+
+// Implicitly unwrapped optionals
+let age1: Int! = nil
+
+// Nil coalescing (Коалесцирование Nil позволяет нам попытаться развернуть необязательный элемент, но предоставить значение по умолчанию, если необязательный элемент содержит nil. Это чрезвычайно полезно в Swift, потому что, хотя опциональные функции-отличная функция, обычно лучше иметь необязательную – иметь реальную строку, а не “может быть строка, может быть ноль”, – и объединение нулей-отличный способ получить это)
+func username(for id: Int) -> String? {
+    if id == 1 {
+        return "Taylor Swift"
+    } else {
+        return nil
+    }
+}
+let user3 = username(for: 15) ?? "Anonymous"
+let lightsaberColor: String? = "green"
+let color = lightsaberColor ?? "blue"
+var selectedYear: Int? = nil
+let actualYear = selectedYear ?? 1989
+
+// Optional chaining
+let names3 = ["John", "Paul", "George", "Ringo"]
+let beatle = names3.first?.uppercased()
+func albumReleased(in year: Int) -> String? {
+    switch year {
+    case 2006: return "Taylor Swift"
+    case 2008: return "Fearless"
+    case 2010: return "Speak Now"
+    case 2012: return "Red"
+    case 2014: return "1989"
+    case 2017: return "Reputation"
+    default: return nil
+    }
+}
+let album = albumReleased(in: 2006)?.uppercased()
+
+// Optional try (Использование try? преобразует возвращаемое значение функции в nil)
+enum PasswordError: Error {
+    case obvious
+}
+
+func checkPassword(_ password: String) throws -> Bool {
+    if password == "password" {
+        throw PasswordError.obvious
+    }
+
+    return true
+}
+
+do {
+    try checkPassword("password")
+    print("That password is good!")
+} catch {
+    print("You can't use that password.")
+}
+if let result = try? checkPassword("password") {
+    print("Result was \(result)")
+} else {
+    print("D'oh.")
+}
+try! checkPassword("sekrit")
+print("OK!")
+
+// Failable initializers
+/* Если инициализатор для структуры или класса может потерпеть неудачу – если вы частично осознаете, что не можете создать объект, используя предоставленные вам данные,-тогда вам нужен отказоустойчивый инициализатор. Вместо того чтобы возвращать новый экземпляр объекта, он возвращает необязательный экземпляр, который будет равен нулю в случае неудачи инициализации.
+ 
+ Создание отказоустойчивого инициализатора занимает два шага:
+
+ Напишите свой инициализатор как init?() а не init()
+ Возвращает nil для любых путей, которые должны завершиться неудачей
+ У вас может быть столько неудачных путей, сколько вам нужно, но вам не нужно беспокоиться о пути успеха – если вы не возвращаете ноль из метода, Swift предполагает, что вы имеете в виду, что все работало правильно. */
+let str2 = "5"
+let num2 = Int(str2)
+struct Person {
+    var id: String
+
+    init?(id: String) {
+        if id.count == 9 {
+            self.id = id
+        } else {
+            return nil
+        }
+    }
+}
+/* struct Employee {
+ var username: String
+ var password: String
+
+ init?(username: String, password: String) {
+     guard password.count >= 8 else { return nil }
+     guard password.lowercased() != "password" else { return nil }
+
+     self.username = username
+     self.password = password
+ }
+} Это требует, чтобы пароли были не менее 8 символов, а не строка “пароль”. Мы можем попробовать это на примере двух сотрудников:
+ let tim = Employee(username: "TimC", password: "app1e")
+ let craig = Employee(username: "CraigF", password: "ha1rf0rce0ne")
+ Первый из них будет необязательным набором для nil, потому что пароль слишком короткий, но второй будет необязательным набором для допустимого экземпляра пользователя.
+
+ Отказоустойчивые инициализаторы дают нам возможность отказаться от создания объекта, если провалятся проверки валидации. В предыдущем случае это был пароль, который был слишком коротким, но вы также могли проверить, было ли имя пользователя уже взято, был ли пароль таким же, как имя пользователя, и так далее. */
+struct Password {
+    var text: String
+    init?(input: String) {
+        if input.count < 6 {
+            print("Password too short.")
+            return nil
+        }
+        text = input
+    }
+}
+let password = Password(input: "hell0")
+
+// Typecasting
+class Animal { }
+class Fish: Animal { }
+
+class Dog: Animal {
+    func makeNoise() {
+        print("Woof!")
+    }
+}
+let pets = [Fish(), Dog(), Fish(), Dog()]
+for pet in pets {
+    if let dog = pet as? Dog {
+        dog.makeNoise()
+    }
+}
+let flavor = "apple and mango"
+if let taste = flavor as? String {
+    print("We added \(taste).")
+}
+class Transport { }
+class Train: Transport {
+    var type = "public"
+}
+class Car: Transport {
+    var type = "private"
+}
+let travelPlans = [Train(), Car(), Train()]
+for plan in travelPlans {
+    if let train = plan as? Train {
+        print("We're taking \(train.type) transport.")
+    }
+}
