@@ -1,0 +1,38 @@
+//
+//  ViewController.swift
+//  Project1
+//
+//  Created by Karpinets Alexander on 23.04.2021.
+//
+
+import UIKit //ссылается на инструментарий пользовательского интерфейса iOS.”
+
+class ViewController: UITableViewController { // означает: “Я хочу создать новый экран данных под названием ViewController, основанный на UIViewController.” Когда вы видите тип данных, который начинается с “UI”, это означает, что он исходит из UIKit. UIViewController-это тип экрана Apple по умолчанию, который является пустым и белым, пока мы его не изменим.
+    var pictures = [String]()
+    override func viewDidLoad() { // Функция переопределения строки func viewDidLoad() запускает метод. Как вы знаете, ключевое слово override необходимо, потому что оно означает “мы хотим изменить поведение Apple по умолчанию с UIViewController”.
+        super.viewDidLoad() /* viewDidLoad() вызывается UIKit, когда экран загружен и готов к настройке.
+         Метод viewDidLoad() содержит одну строку кода с надписью super.viewDidLoad() и одну строку комментария (это строка, начинающаяся с //). Этот суперзвонок означает “скажите UIViewController Apple запустить свой собственный код, прежде чем я запущу свой”, и вы увидите, что это часто используется.*/
+        // Do any additional setup after loading the view.
+       
+        let fm = FileManager.default //  Это тип данных, который позволяет нам работать с файловой системой, и в нашем случае мы будем использовать его для поиска файлов.
+        let path = Bundle.main.resourcePath! // устанавливается в путь к ресурсу пакета вашего приложения. Помните, что пакет-это каталог, содержащий вашу скомпилированную программу и все наши ресурсы. Итак, эта строка гласит: "Скажите мне, где я могу найти все те изображения, которые я добавил в свое приложение."
+        let items = try! fm.contentsOfDirectory(atPath: path) // устанавливается на содержимое каталога по пути. Какой путь? Ну, тот, который был возвращен линией раньше. Как вы можете видеть, длинные имена методов Apple действительно делают их код довольно самоописательным! Константа items будет представлять собой массив строк, содержащих имена файлов.
+
+        for item in items {
+            if item.hasPrefix("nssl") {
+                // this is a picture to load!
+                pictures.append(item)
+            }
+        }
+        print(pictures)
+    }
+    override func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
+        return pictures.count // чтобы строк таблицы было столько же, сколько изображений.
+    }
+    override func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
+        let cell = tableView.dequeueReusableCell(withIdentifier: "Picture", for: indexPath)
+           cell.textLabel?.text = pictures[indexPath.row]
+           return cell // Удаление ячеек из очереди
+    }
+}
+
