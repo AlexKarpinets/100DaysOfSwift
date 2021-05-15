@@ -1,0 +1,281 @@
+//
+//  ViewController.swift
+//  Project8
+//
+//  Created by Karpinets Alexander on 14.05.2021.
+//
+
+import UIKit
+
+class ViewController: UIViewController {
+    
+    //добавляем свойства
+    var cluesLabel: UILabel!
+    var answersLabel: UILabel!
+    var currentAnswer: UITextField!
+    var scoreLabel: UILabel!
+    var letterButtons = [UIButton]()
+    
+    // объявляем массивы с кнопками, решением, очками и уровнем
+    var activatedButtons = [UIButton]()
+    var solutions = [String]()
+
+    var score = 0
+    var level = 1
+    
+    // добавляем пользовательский загрузчик экрана с белым фоном
+    override func loadView() {
+        view = UIView()
+        view.backgroundColor = .white
+        
+        
+     // добавляем метки с размером шрифта и их расположением, выравниванием
+        scoreLabel = UILabel()
+        scoreLabel.translatesAutoresizingMaskIntoConstraints = false
+        scoreLabel.textAlignment = .right
+        scoreLabel.text = "Score: 0"
+        view.addSubview(scoreLabel)
+        
+        // numberOfLines - число строк сколько текст может обернуть
+        cluesLabel = UILabel()
+        cluesLabel.translatesAutoresizingMaskIntoConstraints = false
+        cluesLabel.setContentHuggingPriority(UILayoutPriority(1), for: .vertical)
+        cluesLabel.font = UIFont.systemFont(ofSize: 24)
+        cluesLabel.text = "CLUES"
+        cluesLabel.numberOfLines = 0
+        view.addSubview(cluesLabel)
+
+        answersLabel = UILabel()
+        answersLabel.translatesAutoresizingMaskIntoConstraints = false
+        //скорректировать приоритет содержания для наших ярлыков подсказок и ответов. Более конкретно, мы собираемся дать им приоритет 1, чтобы, когда Auto Layout должен решить, какой вид растягивать, они были первыми в очереди.
+        answersLabel.setContentHuggingPriority(UILayoutPriority(1), for: .vertical)
+        answersLabel.font = UIFont.systemFont(ofSize: 24)
+        answersLabel.text = "ANSWERS"
+        answersLabel.numberOfLines = 0
+        answersLabel.textAlignment = .right
+        view.addSubview(answersLabel)
+        
+        // поле ввода текста серым цветом. userinteractionenabled - останавливает ввод текста пользователем
+        currentAnswer = UITextField()
+        currentAnswer.translatesAutoresizingMaskIntoConstraints = false
+        currentAnswer.placeholder = "Tap letters to guess"
+        currentAnswer.textAlignment = .center
+        currentAnswer.font = UIFont.systemFont(ofSize: 44)
+        currentAnswer.isUserInteractionEnabled = false
+        view.addSubview(currentAnswer)
+        
+        
+       
+        // создаем кнопки
+        let submit = UIButton(type: .system)
+        submit.translatesAutoresizingMaskIntoConstraints = false
+        // метод который соединяем кнопки с кодом
+        submit.addTarget(self, action: #selector(submitTapped), for: .touchUpInside)
+        submit.setTitle("SUBMIT", for: .normal)
+        view.addSubview(submit)
+
+        let clear = UIButton(type: .system)
+        clear.translatesAutoresizingMaskIntoConstraints = false
+        clear.addTarget(self, action: #selector(clearTapped), for: .touchUpInside)
+        clear.setTitle("CLEAR", for: .normal)
+        view.addSubview(clear)
+        
+        //создаем кнопки с частями слов для ответа
+        let buttonsView = UIView()
+        buttonsView.translatesAutoresizingMaskIntoConstraints = false
+        view.addSubview(buttonsView)
+
+        
+        // добавляем отступы по краям (констрейнты и AutoLayout) NSLayoutConstraint - принимает массив (множество) констрейнтов
+        NSLayoutConstraint.activate([
+            scoreLabel.topAnchor.constraint(equalTo: view.layoutMarginsGuide.topAnchor),
+            scoreLabel.trailingAnchor.constraint(equalTo: view.layoutMarginsGuide.trailingAnchor),
+
+            // pin the top of the clues label to the bottom of the score label
+            cluesLabel.topAnchor.constraint(equalTo: scoreLabel.bottomAnchor),
+
+            // pin the leading edge of the clues label to the leading edge of our layout margins, adding 100 for some space
+            cluesLabel.leadingAnchor.constraint(equalTo: view.layoutMarginsGuide.leadingAnchor, constant: 100),
+
+            // make the clues label 60% of the width of our layout margins, minus 100
+            cluesLabel.widthAnchor.constraint(equalTo: view.layoutMarginsGuide.widthAnchor, multiplier: 0.6, constant: -100),
+
+            // also pin the top of the answers label to the bottom of the score label
+            answersLabel.topAnchor.constraint(equalTo: scoreLabel.bottomAnchor),
+
+            // make the answers label stick to the trailing edge of our layout margins, minus 100
+            answersLabel.trailingAnchor.constraint(equalTo: view.layoutMarginsGuide.trailingAnchor, constant: -100),
+
+            // make the answers label take up 40% of the available space, minus 100
+            answersLabel.widthAnchor.constraint(equalTo: view.layoutMarginsGuide.widthAnchor, multiplier: 0.4, constant: -100),
+
+            // make the answers label match the height of the clues label
+            answersLabel.heightAnchor.constraint(equalTo: cluesLabel.heightAnchor),
+            
+            currentAnswer.centerXAnchor.constraint(equalTo: view.centerXAnchor),
+            currentAnswer.widthAnchor.constraint(equalTo: view.widthAnchor, multiplier: 0.5),
+            currentAnswer.topAnchor.constraint(equalTo: cluesLabel.bottomAnchor, constant: 20),
+            
+            submit.topAnchor.constraint(equalTo: currentAnswer.bottomAnchor),
+            submit.centerXAnchor.constraint(equalTo: view.centerXAnchor, constant: -100),
+            submit.heightAnchor.constraint(equalToConstant: 44),
+
+            clear.centerXAnchor.constraint(equalTo: view.centerXAnchor, constant: 100),
+            clear.centerYAnchor.constraint(equalTo: submit.centerYAnchor),
+            clear.heightAnchor.constraint(equalToConstant: 44),
+            
+            buttonsView.widthAnchor.constraint(equalToConstant: 750),
+            buttonsView.heightAnchor.constraint(equalToConstant: 320),
+            buttonsView.centerXAnchor.constraint(equalTo: view.centerXAnchor),
+            buttonsView.topAnchor.constraint(equalTo: submit.bottomAnchor, constant: 20),
+            buttonsView.bottomAnchor.constraint(equalTo: view.layoutMarginsGuide.bottomAnchor, constant: -20)
+        ])
+        
+        let width = 150
+        let height = 80
+        
+        // create 20 buttons as a 4x5 grid
+        for row in 0..<4 {
+            for col in 0..<5 {
+                // create a new button and give it a big font size
+                let letterButton = UIButton(type: .system)
+                letterButton.addTarget(self, action: #selector(letterTapped), for: .touchUpInside)
+                letterButton.titleLabel?.font = UIFont.systemFont(ofSize: 36)
+
+                // give the button some temporary text so we can see it on-screen
+                letterButton.setTitle("Бродяги", for: .normal)
+
+                // calculate the frame of this button using its column and row - установка расположения в ручную из указанных width и height значений
+                let frame = CGRect(x: col * width, y: row * height, width: width, height: height)
+                letterButton.frame = frame
+
+                // add it to the buttons view
+                buttonsView.addSubview(letterButton)
+
+                // and also to our letterButtons array
+                letterButtons.append(letterButton)
+            }
+        }
+    }
+
+    override func viewDidLoad() {
+        super.viewDidLoad()
+        
+        loadLevel()
+    }
+    
+    //методы для нажатия кнопок
+    
+    /*Он добавляет проверку безопасности, чтобы прочитать заголовок с нажатой кнопки или выйти, если по какой-то причине его не было.
+    Добавляет название этой кнопки к текущему ответу игрока.
+    Добавляет кнопку в массив активированных кнопок
+    Скрывает кнопку, которая была нажата.
+    Массив активированных кнопок используется для удержания всех кнопок, которые игрок нажал перед отправкой своего ответа. Это важно, потому что мы скрываем каждую кнопку по мере ее нажатия, поэтому, если пользователь нажимает "Очистить", нам нужно знать, какие кнопки в настоящее время используются, чтобы мы могли их повторно показать. */
+    @objc func letterTapped(_ sender: UIButton) {
+        guard let buttonTitle = sender.titleLabel?.text else { return }
+            currentAnswer.text = currentAnswer.text?.appending(buttonTitle)
+            activatedButtons.append(sender)
+            sender.isHidden = true
+    }
+
+    @objc func submitTapped(_ sender: UIButton) {
+        guard let answerText = currentAnswer.text else { return }
+
+           if let solutionPosition = solutions.firstIndex(of: answerText) {
+               activatedButtons.removeAll()
+                
+            // соединяем слово
+               var splitAnswers = answersLabel.text?.components(separatedBy: "\n")
+               splitAnswers?[solutionPosition] = answerText
+            // joined(separator: "\n") - Это превращает массив в одну строку, причем каждый элемент массива разделяется строкой, указанной в его параметре.
+               answersLabel.text = splitAnswers?.joined(separator: "\n")
+
+               currentAnswer.text = ""
+               score += 1
+                // Если оценка равномерно делится на 7, мы знаем, что они нашли все семь слов, поэтому мы покажем UIAlertController, который предложит пользователю перейти на следующий уровень.
+               if score % 7 == 0 {
+                   let ac = UIAlertController(title: "Well done!", message: "Are you ready for the next level?", preferredStyle: .alert)
+                   ac.addAction(UIAlertAction(title: "Let's go!", style: .default, handler: levelUp))
+                   present(ac, animated: true)
+               }
+           }
+    }
+    
+    // метод начала нового уровня
+    /* Добавьте 1 к уровню.
+    Удалите все элементы из массива решений.
+    Вызовите LoadLevel (), чтобы загрузить и отобразить новый файл уровня.
+    Убедитесь, что все наши кнопки с буквами видны.
+    Теперь добавьте этот метод level Up() : */
+    func levelUp(action: UIAlertAction) {
+        level += 1
+        solutions.removeAll(keepingCapacity: true)
+
+       loadLevel()
+
+        for btn in letterButtons {
+            btn.isHidden = false
+        }
+    }
+    
+    
+// как вы можете видеть, этот метод удаляет текст из текущего текстового поля ответа, раскрывает все активированные кнопки, а затем удаляет все элементы из массива activatedButtons.
+    @objc func clearTapped(_ sender: UIButton) {
+        currentAnswer.text = ""
+
+           for btn in activatedButtons {
+               btn.isHidden = false
+           }
+
+           activatedButtons.removeAll()
+    }
+    
+    
+        // метод загрузки уровня
+        func loadLevel() {
+            // clueString будет хранить все подсказки уровня, строка решения будет хранить количество букв в каждом ответе (в той же позиции, что и подсказки)
+            var clueString = ""
+            var solutionString = ""
+            
+            //letterBits-это массив для хранения всех групп букв: ХА, ЕНТ, ЭД и так далее
+            var letterBits = [String]()
+
+            if let levelFileURL = Bundle.main.url(forResource: "level\(level)", withExtension: "txt") {
+                if let levelContents = try? String(contentsOf: levelFileURL) {
+                    var lines = levelContents.components(separatedBy: "\n")
+                    lines.shuffle()
+                    
+                    //enumerated - передает вам каждый объект из массива как часть вашего цикла, а также положение этого объекта в массиве
+                    for (index, line) in lines.enumerated() {
+                        let parts = line.components(separatedBy: ": ")
+                        let answer = parts[0]
+                        let clue = parts[1]
+
+                        clueString += "\(index + 1). \(clue)\n"
+                        
+                        //replacingOccurrences - Это позволяет указать два параметра и заменить все экземпляры первого параметра вторым параметром. Мы будем использовать это для преобразования "HA|UNT|ED" в "HAUNTED", чтобы у нас был список всех наших решений.
+                        let solutionWord = answer.replacingOccurrences(of: "|", with: "")
+                        solutionString += "\(solutionWord.count) letters\n"
+                        solutions.append(solutionWord)
+
+                        let bits = answer.components(separatedBy: "|")
+                        letterBits += bits
+                    }
+                }
+            }
+            
+            // trimmingCharacters - удаляет все указанные вами буквы из начала и конца строки. Он чаще всего используется с параметром .whitespacesAndNewlines, который обрезает пробелы, табуляции и разрывы строк, и нам нужно именно это здесь, потому что наша строка подсказки и строка решений в конечном итоге будут иметь дополнительный разрыв строки.
+            cluesLabel.text = clueString.trimmingCharacters(in: .whitespacesAndNewlines)
+            answersLabel.text = solutionString.trimmingCharacters(in: .whitespacesAndNewlines)
+
+            letterBits.shuffle()
+
+            if letterBits.count == letterButtons.count {
+                for i in 0 ..< letterButtons.count {
+                    letterButtons[i].setTitle(letterBits[i], for: .normal)
+                }
+            }
+        }
+    }
+    
+
